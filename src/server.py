@@ -1,6 +1,8 @@
 import importlib
 import logging
 
+
+#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
 #  Copyright (C) 2023. Suto-Commune
@@ -28,6 +30,7 @@ import fnmatch
 from src.toml_config import config
 from functools import partial
 from sanic import Sanic
+from sanic import Sanic, Request, json
 from sanic.worker.loader import AppLoader
 
 
@@ -35,6 +38,9 @@ class Server:
     """
     The main class of AntaresViewer server.
     """
+
+    def __init__(self):
+        pass
 
     @staticmethod
     def app_init(app_name: str) -> Sanic:
