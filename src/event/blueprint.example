@@ -1,0 +1,9 @@
+from sanic.response import json
+from sanic import Blueprint
+
+bp = Blueprint("mwdin")
+
+
+@bp.route("/main")
+async def bp_root(request):
+    return json({"my": "blueprint"})
