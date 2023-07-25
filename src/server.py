@@ -27,9 +27,17 @@ from sanic.worker.loader import AppLoader
 
 
 class Server:
+    """
+    The main class of AntaresViewer server.
+    """
 
     @staticmethod
     def define_app(app_name: str) -> Sanic:
+        """
+        Init app and register handler.
+        :param app_name:
+        :return:
+        """
         app = Sanic(app_name)
 
         @app.get("/")
@@ -38,20 +46,33 @@ class Server:
 
         return app
 
-    def define_app_and_loader(self):
+    def define_app_and_loader(self) -> (Sanic, AppLoader):
+        """
+        Init Sanic app and AppLoader.
+        :return:
+        """
         # 设置应用名称
+        # Set app name.
         app_name = "AntaresViewer"
         # app = Sanic(app_name)
-        # 创建AppLoader并传入应用创建函数
 
+        # 创建AppLoader并传入应用创建函数
+        # Create `AppLoader` and pass the app create function.
         loader = AppLoader(factory=partial(self.define_app, app_name))
         loader = AppLoader(factory=Sanic(app_name))
-        # 加载应用
+
+        # 加载应用.
+        # Load `Sanic` application.
         app = loader.load()
         return app, loader
 
     def launcher(self):
-        # 配置应用参数并启动
+        """
+        Launcher AntaresViewer server.
+        :return:
+        """
+        # 配置应用参数并启动.
+        # Init and start.
         app, loader = self.define_app_and_loader()
         app.prepare(port=9999, dev=True)
         Sanic.serve(primary=app, app_loader=loader)
