@@ -1,14 +1,5 @@
-<<<<<<< HEAD
-import logging
-import os
-import fnmatch
-import importlib
-from src.toml_config import config
-
-=======
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
->>>>>>> b536399d2015bdebfca13f685e216e2aa4849c2e
 
 #  Copyright (C) 2023. Suto-Commune
 #  This program is free software: you can redistribute it and/or modify
@@ -29,17 +20,12 @@ from src.toml_config import config
 
 @Date       : 2023/7/25 0:00
 """
-<<<<<<< HEAD
-from functools import partial
-from sanic import Sanic
-=======
 
 import os
 import fnmatch
 from src.toml_config import config
 from functools import partial
 from sanic import Sanic, Request, json
->>>>>>> b536399d2015bdebfca13f685e216e2aa4849c2e
 from sanic.worker.loader import AppLoader
 
 
@@ -47,6 +33,9 @@ class Server:
     """
     The main class of AntaresViewer server.
     """
+
+    def __init__(self):
+        pass
 
     @staticmethod
     def app_init(app_name: str) -> Sanic:
