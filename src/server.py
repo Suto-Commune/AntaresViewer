@@ -1,7 +1,3 @@
-import importlib
-import logging
-
-
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
@@ -25,13 +21,16 @@ import logging
 @Date       : 2023/7/25 0:00
 """
 
-import os
 import fnmatch
-from src.toml_config import config
+import importlib
+import logging
+import os
 from functools import partial
+
 from sanic import Sanic
-from sanic import Sanic, Request, json
 from sanic.worker.loader import AppLoader
+
+from src.toml_config import config
 
 
 class Server:
@@ -40,6 +39,9 @@ class Server:
     """
 
     def __init__(self):
+        """
+        Placeholder.
+        """
         pass
 
     @staticmethod
