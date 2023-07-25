@@ -21,8 +21,10 @@
 @Date       : 2023/7/25 0:00
 """
 import logging
-from src.server import Server
+import subprocess
+import sys
 
+# Init logger.
 logging.basicConfig(level=logging.INFO,
                     format='[%(asctime)s][%(levelname)s][%(filename)s] %(message)s',
                     datefmt='%b/%d/%Y-%H:%M:%S')
@@ -33,7 +35,39 @@ def info():
     logger.info("AntaresViewer 2023@Suto-Commune")
 
 
-if __name__ == "__main__":
+def main():
+    """
+    The start function of AntaresViewer.
+    :return:
+    """
+    from src.server import Server
+
     info()
     server = Server()
     server.launcher()
+
+
+def _(text: str):
+    """
+    留给翻译的,以后写好gettext把此函数删了就行.
+    :param text:
+    :return:
+    """
+    return text
+
+
+if __name__ == "__main__":
+
+    try:
+        main()
+    except ImportError:
+        # update the requirements when `main` func throw 'ImportError'
+        subprocess.call([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt', '--upgrade'])
+
+        # retry
+        main()
+    except BaseException as err:
+        # log the unknown error
+        logging.critical(_('The function "main" could not be loaded, please check if the file is complete.'))
+        logging.exception(err)
+        sys.exit()
