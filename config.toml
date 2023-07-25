@@ -1,0 +1,17 @@
+[server]
+# IP
+host="0.0.0.0"
+# 服务器端口
+port=8000
+# 是否启用生产环境(debug和dev都会失效)
+production=true
+# DEBUG模式
+debug=true
+# DEV模式
+dev=true
+# 子进程数
+workers=4
+# 最大化工作进程（不能与workers一起使用）
+fast=false
+# 请求访问日志（显著降低服务器速度）
+access_log=true

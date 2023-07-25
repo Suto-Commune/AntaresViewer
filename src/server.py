@@ -2,6 +2,8 @@ import logging
 import os
 import fnmatch
 import importlib
+from src.toml_config import config
+
 from functools import partial
 from sanic import Sanic
 from sanic.worker.loader import AppLoader
@@ -17,7 +19,7 @@ class Server:
                 py_files.append(os.path.join(root, file))
 
         for i in range(len(py_files)):
-            py_files[i] = py_files[i].replace('\\', "/").replace('./', "").replace('/', ".").replace(".py","")
+            py_files[i] = py_files[i].replace('\\', "/").replace('./', "").replace('/', ".").replace(".py", "")
             m = py_files[i]
             logging.info(f"Load {m}.")
             module = importlib.import_module(py_files[i])
@@ -38,5 +40,11 @@ class Server:
     def launcher(self):
         # 配置应用参数并启动
         app, loader = self.both_init()
-        app.prepare(port=9999, dev=True)
+        app.prepare(host=config["server"]["host"],
+                    port=config["server"]["port"],
+                    workers=config["server"]["workers"],
+                    fast=config["server"]["fast"],
+                    access_log=config["server"]["access_log"],
+                    dev=config["server"]["dev"] if not config["server"]["production"] else False,
+                    debug=config["server"]["debug"] if not config["server"]["production"] else False)
         Sanic.serve(primary=app, app_loader=loader)
