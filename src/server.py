@@ -20,9 +20,12 @@
 
 @Date       : 2023/7/25 0:00
 """
-from functools import partial
 
-from sanic import Request, Sanic, json
+import os
+import fnmatch
+from src.toml_config import config
+from functools import partial
+from sanic import Sanic
 from sanic.worker.loader import AppLoader
 
 
@@ -32,13 +35,17 @@ class Server:
     """
 
     @staticmethod
-    def define_app(app_name: str) -> Sanic:
+    def app_init(app_name: str) -> Sanic:
         """
         Init app and register handler.
         :param app_name:
         :return:
         """
         app = Sanic(app_name)
+        py_files = []
+        for root, dirs, files in os.walk(r"./src/event"):
+            for file in fnmatch.filter(files, '*.py'):
+                py_files.append(os.path.join(root, file))
 
         @app.get("/")
         async def handler(request: Request):
@@ -46,7 +53,7 @@ class Server:
 
         return app
 
-    def define_app_and_loader(self) -> (Sanic, AppLoader):
+    def both_init(self):
         """
         Init Sanic app and AppLoader.
         :return:
@@ -58,8 +65,7 @@ class Server:
 
         # 创建AppLoader并传入应用创建函数
         # Create `AppLoader` and pass the app create function.
-        loader = AppLoader(factory=partial(self.define_app, app_name))
-        loader = AppLoader(factory=Sanic(app_name))
+        loader = AppLoader(factory=partial(self.app_init, app_name))
 
         # 加载应用.
         # Load `Sanic` application.
@@ -73,6 +79,12 @@ class Server:
         """
         # 配置应用参数并启动.
         # Init and start.
-        app, loader = self.define_app_and_loader()
-        app.prepare(port=9999, dev=True)
+        app, loader = self.both_init()
+        app.prepare(host=config["server"]["host"],
+                    port=config["server"]["port"],
+                    workers=config["server"]["workers"],
+                    fast=config["server"]["fast"],
+                    access_log=config["server"]["access_log"],
+                    dev=config["server"]["dev"] if not config["server"]["production"] else False,
+                    debug=config["server"]["debug"] if not config["server"]["production"] else False)
         Sanic.serve(primary=app, app_loader=loader)
