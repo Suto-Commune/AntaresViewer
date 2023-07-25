@@ -44,7 +44,7 @@ def main():
 
     info()
     server = Server()
-    server.launcher()
+    server.launch()
 
 
 def _(text: str):
