@@ -1,12 +1,9 @@
-<<<<<<< HEAD
 import logging
 import os
 import fnmatch
 import importlib
 from src.toml_config import config
-=======
-#!/usr/bin/env python
-# -*- coding: UTF-8 -*-
+
 
 #  Copyright (C) 2023. Suto-Commune
 #  This program is free software: you can redistribute it and/or modify
@@ -27,9 +24,6 @@ from src.toml_config import config
 
 @Date       : 2023/7/25 0:00
 """
-from functools import partial
->>>>>>> 1360fd9e24ed5443cb35a440493e7321ff45947c
-
 from functools import partial
 from sanic import Sanic
 from sanic.worker.loader import AppLoader
