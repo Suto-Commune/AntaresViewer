@@ -47,10 +47,12 @@ class Server:
             for file in fnmatch.filter(files, '*.py'):
                 py_files.append(os.path.join(root, file))
 
-        @app.get("/")
-        async def handler(request: Request):
-            return json({"app_name": request.app.name})
-
+        for i in range(len(py_files)):
+            py_files[i] = py_files[i].replace('\\', "/").replace('./', "").replace('/', ".").replace(".py", "")
+            m = py_files[i]
+            logging.info(f"Load {m}.")
+            module = importlib.import_module(py_files[i])
+            app.blueprint(module.bp)
         return app
 
     def both_init(self):
@@ -72,7 +74,7 @@ class Server:
         app = loader.load()
         return app, loader
 
-    def launcher(self):
+    def launch(self):
         """
         Launcher AntaresViewer server.
         :return:
