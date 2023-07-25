@@ -63,7 +63,7 @@ class Server:
         app = loader.load()
         return app, loader
 
-    def launcher(self):
+    def launch(self):
         # 配置应用参数并启动
         app, loader = self.both_init()
         app.prepare(host=config["server"]["host"],
