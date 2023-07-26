@@ -1,8 +1,4 @@
-import importlib
-import logging
-
-
-#!/usr/bin/env python
+# !/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
 #  Copyright (C) 2023. Suto-Commune
@@ -25,12 +21,13 @@ import logging
 @Date       : 2023/7/25 0:00
 """
 
+import importlib
+import logging
 import os
 import fnmatch
 from src.toml_config import config
 from functools import partial
 from sanic import Sanic
-from sanic import Sanic, Request, json
 from sanic.worker.loader import AppLoader
 
 

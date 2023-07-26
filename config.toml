@@ -15,3 +15,5 @@ workers=4
 fast=false
 # 请求访问日志（显著降低服务器速度）
 access_log=true
+[database]
+url="mongodb://localhost:27017"
