@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # !/usr/bin/env python
+=======
+#!/usr/bin/env python
+>>>>>>> cde9b53728063cd43fdf57467549bf3ca497d437
 # -*- coding: UTF-8 -*-
 
 #  Copyright (C) 2023. Suto-Commune
@@ -21,14 +25,23 @@
 @Date       : 2023/7/25 0:00
 """
 
+<<<<<<< HEAD
 import importlib
 import logging
 import os
+=======
+>>>>>>> cde9b53728063cd43fdf57467549bf3ca497d437
 import fnmatch
-from src.toml_config import config
+import importlib
+import logging
+import os
 from functools import partial
+from pathlib import Path
+
 from sanic import Sanic
 from sanic.worker.loader import AppLoader
+
+from src.toml_config import config
 
 
 class Server:
@@ -37,26 +50,38 @@ class Server:
     """
 
     def __init__(self):
+        """
+        Placeholder.
+        """
         pass
 
     @staticmethod
     def app_init(app_name: str) -> Sanic:
         """
-        Init app and register handler.
+        Init app and register blueprints.
         :param app_name:
         :return:
         """
+        # Init app.
         app = Sanic(app_name)
-        py_files = []
-        for root, dirs, files in os.walk(r"./src/event"):
-            for file in fnmatch.filter(files, '*.py'):
-                py_files.append(os.path.join(root, file))
 
-        for i in range(len(py_files)):
-            py_files[i] = py_files[i].replace('\\', "/").replace('./', "").replace('/', ".").replace(".py", "")
-            m = py_files[i]
+        def get_py_files(path: Path):
+            """
+            Get all python files in the given path.
+            """
+            for root, dirs, files in os.walk(path):
+                # Get all files that end with .py
+                yield from (Path(root) / file for file in fnmatch.filter(files, '*.py'))
+
+        for i, v in enumerate(get_py_files(Path("src/event"))):
+            # Standardize the path.
+            m = v.as_posix().replace('\\', "/").replace('./', "").replace('/', ".").replace(".py", "")
+
+            # Load module.
             logging.info(f"Load {m}.")
-            module = importlib.import_module(py_files[i])
+            module = importlib.import_module(m)
+
+            # Register blueprint.
             app.blueprint(module.bp)
         return app
 
@@ -68,7 +93,6 @@ class Server:
         # 设置应用名称
         # Set app name.
         app_name = "AntaresViewer"
-        # app = Sanic(app_name)
 
         # 创建AppLoader并传入应用创建函数
         # Create `AppLoader` and pass the app create function.
