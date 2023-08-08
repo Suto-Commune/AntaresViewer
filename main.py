@@ -40,7 +40,7 @@ def main():
     The start function of AntaresViewer.
     :return:
     """
-    from src.server import Server
+    from src.server_launcher import Server
 
     info()
     server = Server()
