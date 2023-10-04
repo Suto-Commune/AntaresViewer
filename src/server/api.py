@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import fastapi
 import os
 import importlib
@@ -10,22 +12,16 @@ class App:
 
     @staticmethod
     def find_python_files(directory):
-        python_files = []
         for root, dirs, files in os.walk(directory):
-            for file in files:
-                if file.endswith(".py"):
-                    python_files.append(os.path.join(root, file))
-        return python_files
+            root_ = Path(root)
+            yield from map(lambda x: root_ / x, filter(lambda x: x.endswith(".py"), files))
 
     def register_route(self):
-        py_files = self.find_python_files("./src/server/event")
-        py_files = [file for file in py_files if "__init__.py" not in file]
-        modules = []
-        for i in range(len(py_files)):
-            py_files[i] = py_files[i].replace("\\", "/").replace("./", "").replace("/", ".").replace(".py", "")
-            modules.append(importlib.import_module(py_files[i]))
-        for i in modules:
-            self.app.include_router(i.router)
+        py_files = filter(lambda x: "__init__.py" not in x.as_posix(), self.find_python_files("./src/server/event"))
+
+        for i in py_files:
+            i = i.as_posix().replace("\\", "/").replace("./", "").replace("/", ".").replace(".py", "")
+            self.app.include_router(importlib.import_module(i).router)
 
 
 App = App()
