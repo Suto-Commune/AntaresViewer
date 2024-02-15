@@ -1,12 +1,11 @@
 import fastapi
+import src.function.format.avi as AVI
 
 router = fastapi.APIRouter()
-default_url = '/'+str(__name__).replace("src.server.event.", "").replace(".", "/")
-
-print(str(default_url))
+Name = AVI.Name()
+default_url = "/"
 
 
 @router.get(default_url)
-async def example():
-    print(str(default_url))
-    return {"Hello,AntaresViewer"}
+async def welcome():
+    return {"text": "Welcome to AntaresViewer!"}
