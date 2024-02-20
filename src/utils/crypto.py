@@ -26,6 +26,8 @@
 import hashlib
 import inspect
 import secrets
+import time
+import jwt
 
 
 def _get_hasher(method="sha256"):
@@ -38,7 +40,7 @@ def _get_hasher(method="sha256"):
 
 
 def password_hash(
-    password: str, method: str = "scrypt", salt_length: int = 16, **kwargs
+        password: str, method: str = "scrypt", salt_length: int = 16, **kwargs
 ) -> str:
     """
     Hash the password with the given method.
@@ -97,3 +99,20 @@ def check_password_hash(password: str, hash_: str) -> bool:
 
     # return the result
     return h == hash__
+
+
+class JWT:
+    def __init__(self, key: str):
+        self.key = key
+
+    def encode(self, data: dict, *, timeout: int = 36000) -> str:
+        header = {"alg": "HS256", "typ": "JWT"}
+        exp = int(time.time()) + timeout
+        payload = {"exp": exp, **data}
+        token = jwt.encode(
+            payload=payload, key=self.key, algorithm="HS256", headers=header
+        )
+        return token
+
+    def decode(self, token: str) -> dict[str, any]:
+        return jwt.decode(token, key=self.key, algorithms=["HS256"])

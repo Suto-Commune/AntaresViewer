@@ -9,3 +9,8 @@ workers=0
 reload=true
 # 请求访问日志（显著降低服务器速度）
 access_log=true
+# DB
+[DB]
+db_uri="localhost:27017"
+db_username=""
+db_password=""
