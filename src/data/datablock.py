@@ -11,7 +11,7 @@ class DataBlock:
         self.fullpath = self.path / (self.name + ".json")
 
     def create(self):
-        if not os.path.exists(self.fullpath):
+        if not self.fullpath.exists():
             with open(self.fullpath, "w", encoding="UTF-8") as f:
                 f.close()
 

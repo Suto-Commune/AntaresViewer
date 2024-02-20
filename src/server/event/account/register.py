@@ -1,4 +1,5 @@
 import os
+import uuid
 from typing import Union
 
 import fastapi
@@ -14,26 +15,32 @@ router = fastapi.APIRouter()
 
 
 @router.get(default_url)
-async def register(username: str, password: str, sid: Union[str, None] = None):
-    salt = os.urandom(16)
+async def register(username: str, password: str):
+    # Get password hash
     _hash = password_hash(password=password, n=16384, r=8, p=1, maxmem=0, dklen=64)
     user = {
         "username": username,
         "password": _hash
     }
+
+    # Init db
     DB = datablock.DataBlock("", "users")
     DB.create()
     info = DB.diiiict()
-    if sid is None:
-        sid = random_string.random_string()
+
+
+
+    # Check if info is empty
     if info:
         user["id"] = len(info["users"])
     else:
         info = {"users": []}
         user["id"] = 0
 
-    user["sid"] = sid
+    user["uid"] = uuid.uuid4().hex
     info["users"].append(user)
+
+    # Write to db
     DB.update(info)
 
     return {"Hello,AntaresViewer"}
