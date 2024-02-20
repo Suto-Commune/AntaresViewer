@@ -1,10 +1,17 @@
+import secrets
+from pathlib import Path
+
 import uvicorn
+
 from src.toml_config import config
 
 
 class Server:
     def __init__(self):
         self.server_config = config["server"]
+        if not (key_file := Path("server.key")).exists():
+            with key_file.open("w",encoding="utf-8") as f:
+                f.write(secrets.token_urlsafe(32))
 
     def launch(self):
         log_config = {

@@ -15,6 +15,7 @@ router = fastapi.APIRouter()
 
 
 @router.get(default_url)
+@router.post(default_url)
 async def register(email: str, username: str, password: str):
     # Get password hash
     _hash = password_hash(password=password, n=16384, r=8, p=1, maxmem=0, dklen=64)
@@ -29,8 +30,8 @@ async def register(email: str, username: str, password: str):
     # Init db
     print(config.DB.db_uri, "Antares_accounts", config.DB.db_username, config.DB.db_password)
     db = DB(config.DB.db_uri, "Antares_accounts", config.DB.db_username, config.DB.db_password)
-
-    user["uid"] = uuid.uuid4().hex
+    uid=uuid.uuid4().hex
+    user["uid"] = uid
     result = await db.insert("users", user)
     print(result)
-    return {"code": "200"}
+    return {"code": "200","uid":uid}
