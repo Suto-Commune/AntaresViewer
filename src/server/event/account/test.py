@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-#  Copyright (C) 2023. Suto-Commune
+#  Copyright (C) 2023. HCAT-Project-Team
 #  _
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU Affero General Public License as
@@ -17,11 +17,11 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
-@File       : login.py
+@File       : test.py
 
 @Author     : hsn
 
-@Date       : 2/20/24 6:49 PM
+@Date       : 2/20/24 9:12 PM
 """
 import logging
 from pathlib import Path
@@ -34,6 +34,7 @@ from src.function.database.db import DB
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from src.toml_config import config
 from src.utils.crypto import check_password_hash, JWT
+from src.utils.oauth import get_current_active_user, get_current_user
 
 logger = logging.getLogger(__name__)
 Name = AVInfo.Name()
@@ -43,21 +44,6 @@ router = fastapi.APIRouter()
 
 @router.get(default_url)
 @router.post(default_url)
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+async def test(user: dict = Depends(get_current_user)):
+    return user
 
-    db = DB(config.DB.db_uri, "Antares_accounts", config.DB.db_username, config.DB.db_password)
-    rst = await db.find("users", {"uid": form_data.username})
-    if rst:
-        user_data = rst[0]
-        psw_hash = user_data["password"]
-        login_success = check_password_hash(password=form_data.password, hash_=psw_hash)
-    else:
-        return {"code": "403", "message": "Login failed, uid error."}
-
-    if login_success:
-        with Path("server.key").open("r", encoding="utf-8") as f:
-            key = f.read()
-        token = JWT(key).encode({"uid": form_data.username})
-        return {"code": "200", "token": token, "token_type": "bearer"}
-    else:
-        return {"code": "403", "message": "Login failed, password error."}
