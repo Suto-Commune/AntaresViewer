@@ -20,7 +20,7 @@ async def register(email: str, username: str, password: str):
     # Get password hash
     _hash = password_hash(password=password, n=16384, r=8, p=1, maxmem=0, dklen=64)
     if not AVInfo.is_valid_email(email):
-        return {"code": "-1"}  # 格式错误
+        return {"code": "403", "message": "Email format error."}  # 格式错误
     user = {
         "email": email,
         "username": username,
@@ -30,8 +30,8 @@ async def register(email: str, username: str, password: str):
     # Init db
     print(config.DB.db_uri, "Antares_accounts", config.DB.db_username, config.DB.db_password)
     db = DB(config.DB.db_uri, "Antares_accounts", config.DB.db_username, config.DB.db_password)
-    uid=uuid.uuid4().hex
+    uid = uuid.uuid4().hex
     user["uid"] = uid
     result = await db.insert("users", user)
     print(result)
-    return {"code": "200","uid":uid}
+    return {"code": "200", "uid": uid}
