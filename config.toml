@@ -10,6 +10,8 @@ reload=true
 # 请求访问日志（显著降低服务器速度）
 access_log=true
 # DB
+strict_email=false
+#严格邮箱后缀匹配，会获得cpu100%加成
 [DB]
 db_uri="localhost:27017"
 db_username=""
