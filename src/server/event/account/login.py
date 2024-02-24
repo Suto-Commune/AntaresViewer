@@ -58,6 +58,6 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         with Path("server.key").open("r", encoding="utf-8") as f:
             key = f.read()
         token = JWT(key).encode({"uid": form_data.username})
-        return {"code": "200", "token": token, "token_type": "bearer"}
+        return {"code": "200", "access_token": token, "token_type": "bearer"}
     else:
         return {"code": "403", "message": "Login failed, password error."}

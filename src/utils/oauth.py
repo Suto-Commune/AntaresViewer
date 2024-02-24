@@ -24,9 +24,11 @@
 @Date       : 2/20/24 9:05 PM
 """
 from pathlib import Path
+from typing import Annotated
 
 import jwt
 from fastapi import HTTPException, Depends, status
+from fastapi import Header
 from fastapi.security import OAuth2PasswordBearer
 
 from src.function.database.db import DB
@@ -37,6 +39,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="account/login")
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
+
     with Path("server.key").open("r", encoding="utf-8") as f:
         key = f.read()
     credentials_exception = HTTPException(
