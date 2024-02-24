@@ -24,13 +24,12 @@
 @Date       : 2/20/24 9:05 PM
 """
 from pathlib import Path
-from typing import Annotated
 
 import jwt
 from fastapi import HTTPException, Depends, status
-from fastapi import Header
 from fastapi.security import OAuth2PasswordBearer
 
+from src.data.containers.user import UserWithSession
 from src.function.database.db import DB
 from src.toml_config import config
 from src.utils.crypto import JWT
@@ -39,7 +38,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="account/login")
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
-
     with Path("server.key").open("r", encoding="utf-8") as f:
         key = f.read()
     credentials_exception = HTTPException(
@@ -48,22 +46,32 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        print(1)
-        print(token)
         payload = JWT(key).decode(token)
         username: str = payload.get("uid")
         if username is None:
             raise credentials_exception
 
     except jwt.PyJWTError:
-        print(2)
         raise credentials_exception
     db = DB(config.DB.db_uri, "Antares_accounts", config.DB.db_username, config.DB.db_password)
     rst = await db.find("users", {"uid": username})
-    user = rst[0]
-    if not user:
-        print(3)
+    user_dict: dict = rst[0]
+    if payload.get("session") not in user_dict.get("active_sessions", {}):
         raise credentials_exception
+    if not user_dict:
+        raise credentials_exception
+
+    user_dict.update(payload)
+    user_dict.pop("_id")
+    user_dict.pop("exp")
+
+    user = UserWithSession(**user_dict)
+
+    async def callback(data: dict):
+        for k, v in data.items():
+            await db.update("users", {"uid": username}, k, v)
+
+    user.set_save_callback(callback)
     return user
 
 

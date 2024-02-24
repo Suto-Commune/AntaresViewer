@@ -32,7 +32,7 @@ class User:
     username: str
     password: str
     email: str
-    status: str = "offline"
+    active_sessions: dict = dataclasses.field(default_factory=dict)
 
     def dump(self):
         return dataclasses.asdict(self)
@@ -40,3 +40,26 @@ class User:
     @staticmethod
     def load(data: dict):
         return User(**data)
+
+
+@dataclasses.dataclass
+class UserWithSession(User):
+    session: str = ''
+    user_agent: str = ''
+
+    def set_save_callback(self, callback: callable):
+        self.save_callback = callback
+
+    async def save(self):
+        if self.save_callback:
+            await self.save_callback(self.dump())
+
+    def dump(self):
+        d = dataclasses.asdict(self)
+        d.pop("session")
+        d.pop("user_agent")
+        return d
+
+    @staticmethod
+    def load(data: dict):
+        return UserWithSession(**data)

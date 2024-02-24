@@ -24,10 +24,12 @@
 @Date       : 2/20/24 6:49 PM
 """
 import logging
+import uuid
 from pathlib import Path
+from typing import Annotated
 
 import fastapi
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Header
 from fastapi.security import OAuth2PasswordRequestForm
 
 import src.function.format.avi as AVInfo
@@ -43,13 +45,16 @@ router = fastapi.APIRouter()
 
 @router.get(default_url)
 @router.post(default_url)
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), user_agent: Annotated[str | None, Header()] = None):
+    # get user
     db = DB(config.DB.db_uri, "Antares_accounts", config.DB.db_username, config.DB.db_password)
+
     rst = await db.find("users", {"uid": form_data.username})
     if not rst:
         rst = await db.find("users", {"email": form_data.username})
         if not rst:
             raise HTTPException(status_code=400, detail="Incorrect username")
+
     user_data = rst[0]
     psw_hash = user_data["password"]
     login_success = check_password_hash(password=form_data.password, hash_=psw_hash)
@@ -57,7 +62,12 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if login_success:
         with Path("server.key").open("r", encoding="utf-8") as f:
             key = f.read()
-        token = JWT(key).encode({"uid": form_data.username})
+        session_id = uuid.uuid4().hex
+        token = JWT(key).encode({"uid": form_data.username, "user_agent": user_agent, "session": session_id})
+
+        user_data["active_sessions"][session_id] = user_agent
+        await db.update("users", {"uid": form_data.username}, "active_sessions", user_data["active_sessions"])
+
         return {"code": "200", "access_token": token, "token_type": "bearer"}
     else:
         raise HTTPException(status_code=400, detail="Incorrect password")
